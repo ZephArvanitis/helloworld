@@ -1,0 +1,47 @@
+{% extends 'helloworld/base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block head_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="bg-white px-4 pt-5 sm:px-6">
+  <div class="-ml-4 -mt-5 pb-3 flex items-center justify-between flex-wrap sm:flex-nowrap border-b border-gray-400">
+    <div class="ml-0 mt-2">
+      <h3 class="text-xl leading-6 font-medium text-gray-900">
+        Users
+      </h3>
+    </div>
+    <div class="ml-4 mt-2 flex-shrink-0">
+      <button id="send-button" type="button" class="relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        Send notification
+      </button>
+    </div>
+  </div>
+
+
+<ul class="divide-y divide-gray-200">
+    <li class="relative bg-white py-5 px-4 hover:bg-gray-50 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+      <div class="flex justify-between space-x-3">
+        <div class="min-w-0 flex-1">
+          <a href="#" class="block focus:outline-none">
+            <span class="absolute inset-0" aria-hidden="true"></span>
+            <p class="text-sm font-medium text-gray-900 truncate">Gloria Roberston</p>
+            <p class="text-sm text-gray-500 truncate">Velit placeat sit ducimus non sed</p>
+          </a>
+        </div>
+        <time datetime="2021-01-27T16:35" class="flex-shrink-0 whitespace-nowrap text-sm text-gray-500">1d ago</time>
+      </div>
+      <div class="mt-1">
+      </div>
+    </li>
+<!-- more list items -->
+
+  </ul>
+</div>
+{% endblock %}
+
+{% block endscripts %}
+<script src="{% static 'ts-out/bundle.js' %}"></script>
+
+{% endblock %}
