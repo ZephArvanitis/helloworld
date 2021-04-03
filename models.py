@@ -20,6 +20,7 @@ class UserDevice(models.Model):
     """
     user = models.ForeignKey('ApplicationUser', on_delete=models.CASCADE)
     device_type = models.ForeignKey('DeviceType', on_delete=models.CASCADE)
+    device_token = models.CharField(max_length=100)
 
 
 class DeviceType(models.Model):

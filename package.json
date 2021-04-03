@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@tailwindcss/forms": "^0.3.2",
     "@types/jquery": "^3.5.5",
     "tailwindcss": "^2.0.4",
     "ts-loader": "^8.1.0",

@@ -1,10 +1,17 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
+import json
 import random
 import string
 
 from .models import ApplicationUser, DeviceType, UserDevice
+from .notifications import Messenger
+
+
+# persist unregistered tokens by keeping this messenger globally
+messenger = Messenger()
 
 
 # Homepage
@@ -48,10 +55,14 @@ def _add_random_user():
     devices = []
     for _ in range(number_of_devices):
         device_type = random.choice(device_types)
-        device = UserDevice.objects.create(user=user, device_type=device_type)
+        device_token = Messenger.generate_token()
+        device = UserDevice.objects.create(user=user, device_type=device_type,
+                                           device_token=device_token)
 
 
 def post_add_random_users(request):
+    """Add ten random users and their devices
+    """
     if request.method == "POST":
         for _ in range(10):
             _add_random_user()
@@ -60,9 +71,32 @@ def post_add_random_users(request):
     return JsonResponse({"success":False}, status=400)
 
 
+@csrf_exempt  # TODO: Fix this!!  Time-saving shortcut as my csrf token is acting up.
+def post_notify_users(request):
+    """Notify the users indicated of something VERY important
+    """
+    if request.method == "POST":
+        received_json_data = json.loads(request.body.decode("utf-8"))
+        if not "user_ids" in received_json_data and "notification_body" in received_json_data:
+            return JsonResponse({"success": False}, status=400) 
+        user_ids = received_json_data["user_ids"]
+        notification_body = received_json_data["notification_body"]
+
+        notifications_status = messenger.send_notifications(user_ids, notification_body)
+
+        status_code = notifications_status["status_code"]
+        if status_code == 200:
+            return JsonResponse({"success": True, "notified": notifications_status["devices_notified"]})
+        return JsonResponse({"success": False}, status=status_code)
+    return JsonResponse({"success": False}, status=400) 
+
+
 def get_random_number(request):
+    """That old sample ajax call, as a placeholder
+    """
     if request.method == "GET":
         # https://xkcd.com/221/
+        _add_random_user()
         random_number = 4  # chosen by fair dice roll. Guaranteed random.
         return JsonResponse({"success": True,
                              "random_number": random_number,
