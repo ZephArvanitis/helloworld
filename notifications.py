@@ -47,7 +47,6 @@ class Messenger(object):
         if len(tokens) == 0:
             return {"status_code": 200, "devices_notified": 0}
 
-        print("tokens:", tokens)
         # Chunk it into batches of <500 and send 'em off.
         chunk_size = 490
         chunks = [tokens[i:i + chunk_size] for i in range(0, len(tokens), chunk_size)] 
@@ -67,17 +66,14 @@ class Messenger(object):
                 # Went great! Remove chunk and increment total_devices_notified
                 chunks = chunks[1:]
                 not_notified_count = len(response["not_registered_tokens"])
-                print(len(chunk), not_notified_count)
                 total_devices_notified += len(chunk) - not_notified_count
             elif status_code == 500:
                 # Error, no messages sent. Try again after we've done the other chunks
                 chunks = chunks[1:] + [chunk]
             else:
                 # Either we messed up and sent more than 500 tokens or some other error happened.
-                print("Unknown error in Messenger.send_notifications")
                 chunks = chunks[1:] + [chunk]
 
-        print("Notified {x} devices".format(x=total_devices_notified))
         if total_devices_notified == 0:
             # Uh oh, in spite of our attempts we weren't able to notify anyone...
             return {"status_code": 500}

@@ -51,7 +51,6 @@ var send_button_success_bg = "bg-green-600";
 
 
 function setSendButtonToPending() {
-  console.log("pending");
   var sendButton: HTMLButtonElement = document.querySelector("#send-button");
   sendButton.innerHTML = "...";
   sendButton.disabled = true;
@@ -60,7 +59,6 @@ function setSendButtonToPending() {
 }
 
 function setSendButtonToNumber(nDevicesNotified: number) {
-  console.log("number");
   var sendButton: HTMLButtonElement = document.querySelector("#send-button");
   sendButton.innerHTML = `${nDevicesNotified} devices notified...`;
   sendButton.classList.remove(send_button_pending_bg);
@@ -68,7 +66,6 @@ function setSendButtonToNumber(nDevicesNotified: number) {
 }
 
 function setSendButtonToSend() {
-  console.log("send");
   var sendButton: HTMLButtonElement = document.querySelector("#send-button");
   sendButton.disabled = false;
   sendButton.classList.remove(send_button_success_bg);
@@ -141,12 +138,10 @@ function initialize() {
     // get search term
     var element = this as HTMLInputElement;
     var searchTerm = element.value;
-    console.log(searchTerm);
     // loop over user <li>s
     $(".user-name-element").each(function () {
       var element = this as HTMLInputElement;
       var matchesSearch = (searchTerm == "") || element.value.toLowerCase().includes(searchTerm);
-      console.log(element.value, searchTerm, matchesSearch ? "matches" : "doesn't match");
       var elementId = this.id;
       var userId = parseInt(elementId.split('-')[1]);
       var liElement: HTMLElement = document.querySelector(`#li-${userId}`)
