@@ -3,8 +3,7 @@
 
 Related to github (dot) com/twentyinc (slash) push_notifications_project. (That should be enough to prevent this coming up in searches)
 
-[Live demo](https://apps.wxyzeph.com/helloworld/)
-
+[Live demo](https://apps.wxyzeph.com/helloworld/) (EDIT: this demo is running on a poor overburdened web server at the moment. It seems to be consistently up-ish, but thanks to what I believe is the interface between django and mysql, sometimes, there's 5-6 seconds of latency before django gets to process any request. Please note that I do not suggest that any website with five second latency is usable. I'm working on it.)
 
 
 ## Thoughts
