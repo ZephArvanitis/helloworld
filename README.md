@@ -3,6 +3,8 @@
 
 Related to github (dot) com/twentyinc (slash) push_notifications_project. (That should be enough to prevent this coming up in searches)
 
+![Homepage](https://user-images.githubusercontent.com/4411956/113533870-a2905b00-9594-11eb-8d27-767c5cfa999b.png)
+
 [Live demo](https://apps.wxyzeph.com/helloworld/) (EDIT: this demo is running on a poor overburdened web server at the moment. It seems to be consistently up-ish, but thanks to what I believe is the interface between django and mysql, sometimes, there's 5-6 seconds of latency before django gets to process any request. Please note that I do not suggest that any website with five second latency is usable. I'm working on it.)
 
 
@@ -13,7 +15,7 @@ This was a great deal of fun to think about and play with! In general, I feel I 
 In ding number one against Zeph on this challenge, I misread the prompt and thought you explicitly wanted the front and backend to talk to one another, so I dedicated far more time to that than was needed, which means I spent less time on fun edge cases and fine tuning the backend. Sorry about that! If you're willing to give me another hour, I'd be happy to show off my backend chops and just improve the *extremely* naive current implementation of `send_notifications`.
 
 ## Time
-In total, my best estimate is that I spent 4.5-ish hours on this, not counting some necessary debugging on my server that I needed to get around to anyway (some middleware was getting greedy and causing very slow responses). An approximate breakdown:
+In total, my best estimate is that I spent 4.5-ish hours on this, not counting some ongoing debugging on my server that I needed to get around to anyway (some middleware was getting greedy and causing very slow responses). An approximate breakdown:
 
  1. The first hour was spent getting a django app up and running locally and piecing together a semi-acceptable UI with a sample `fetch` request for connecting front and back ends.
  2. The second hour set up the backend database, fed data from there to the frontend, and visualized it in a list.
