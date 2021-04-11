@@ -8,10 +8,10 @@ import string
 
 from .models import ApplicationUser, DeviceType, UserDevice
 from .notifications import Messenger
+from .messaging_service import MessagingService
 
 
-# persist unregistered tokens by keeping this messenger globally
-messenger = Messenger()
+messaging_service = MessagingService()
 
 
 # Homepage
@@ -19,9 +19,20 @@ def index_view(request):
     """Render the index page for this app.
     """
     template_name = 'helloworld/index.html'
-    users = ApplicationUser.objects.all()
+    # devices = UserDevice.objects.select_related('device_type').all()
+    device_types = DeviceType.objects.all()
+    device_type_dict = {device_type.id : device_type.type_name
+                        for device_type in device_types}
+    users = ApplicationUser.objects.prefetch_related('userdevice_set').all()
+    # Format the information we need in the template
+    users_for_display = [{"name": user.name,
+                          "id": user.id,
+                          "device_types": [device_type_dict[dev.device_type_id]
+                                           for dev in user.userdevice_set.all()]}
+                         for user in users]
+
     kwargs = {"title": "Push Notification Central",
-              "users": users
+              "users": users_for_display
              }
     return render(request, template_name, kwargs)
 
@@ -82,7 +93,7 @@ def post_notify_users(request):
         user_ids = received_json_data["user_ids"]
         notification_body = received_json_data["notification_body"]
 
-        notifications_status = messenger.send_notifications(user_ids, notification_body)
+        notifications_status = messaging_service.send_notifications(user_ids, notification_body)
 
         status_code = notifications_status["status_code"]
         if status_code == 200:
