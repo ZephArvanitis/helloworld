@@ -28,3 +28,12 @@ class DeviceType(models.Model):
     """Devices come in various types (e.g. mobile vs desktop). Describe type.
     """
     type_name = models.CharField(max_length=30)
+
+
+class PendingNotification(models.Model):
+    """Persist pending notifications for robust restarts.
+    """
+    # Store just device token to simplify logic. Long-term we'd want to ForeignKey
+    # this like device = models.ForeignKey('UserDevice', on_delete=models.CASCADE)
+    device_token = models.CharField(max_length=100)
+    notification_body = models.CharField(max_length=1000)  # Assuming push notifications are relatively short

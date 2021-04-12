@@ -3,7 +3,7 @@ import random
 import string
 import time
 
-from .models import ApplicationUser, UserDevice
+from .models import ApplicationUser, UserDevice, PendingNotification
 from .notifications import Messenger
 
 class MessagingService(object):
@@ -23,6 +23,7 @@ class MessagingService(object):
         """Set up the messenger we'll use.
         """
         self.messenger = Messenger()
+
         # Get initial unregistered tokens from the database
         bad_tokens_query = (UserDevice.objects
                                       .filter(token_not_registered=True)
@@ -32,6 +33,27 @@ class MessagingService(object):
         bad_tokens = [dtt[0] for dtt in bad_tokens_query]
         # De-duplicate, just in case
         self.not_registered_tokens = set(bad_tokens)
+
+        # Retrieve and send any unsent notifications on restart
+        pending_notifications = list(PendingNotification
+            .objects
+            .values('device_token', 'notification_body'))
+
+        if len(pending_notifications) > 0:
+            # Pick out unique notification bodies
+            notification_bodies = list(set(
+                [notification['notification_body']
+                 for notification in pending_notifications]))
+
+            # Group by notification text
+            for notification_body in notification_bodies:
+                tokens_for_notification = [
+                    notification['device_token']
+                    for notification in pending_notifications
+                    if notification['notification_body'] == notification_body]
+                # Send 'em off!
+                self._send_notification_to_tokens(tokens_for_notification, notification_body)
+
 
     def set_all_tokens_registered(self):
         """Re-register all tokens, or eventually you won't be able to send
@@ -84,11 +106,22 @@ class MessagingService(object):
 
         # Notify all devices for all users, except ones that are no longer registered.
         tokens = self._get_all_tokens_for_users(user_ids)
-        
+
         # Short circuit if we're not notifying anyone
         if len(tokens) == 0:
             return {"status_code": 200, "devices_notified": 0}
 
+        # Add these tokens and the notification body to our PendingNotification table
+        new_pending_notifications = [
+            PendingNotification(device_token=token, notification_body=notification_body)
+            for token in tokens]
+        PendingNotification.objects.bulk_create(new_pending_notifications)
+
+        return self._send_notification_to_tokens(tokens, notification_body)
+
+    def _send_notification_to_tokens(self, tokens, notification_body):
+        """Do the work of sending notification to specific tokens.
+        """
         # Chunk it into batches of <500 and send 'em off.
         chunk_size = 490
         chunks = [tokens[i:i + chunk_size] for i in range(0, len(tokens), chunk_size)] 
@@ -102,6 +135,14 @@ class MessagingService(object):
             chunk = chunks[0]
             total_tries += 1
             # Send it off
+            # Given that "don't notify a device twice" is more important here than
+            # "ensure all devices are notified", let's remove pending notifications
+            # from the database before sending off to the messenger.
+            (PendingNotification.objects
+                                .filter(notification_body=notification_body,
+                                        device_token__in=tokens)
+                                .delete())
+
             response = self.messenger.send(chunk, notification_body)
             # check how it went
             status_code = response["status_code"]
